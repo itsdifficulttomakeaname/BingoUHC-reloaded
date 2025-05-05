@@ -1,0 +1,22 @@
+name: ${project.name}
+version: ${project.version}
+main: org.bingoUHC_reloaded.BingoUHC_reloaded
+load: STARTUP
+api-version: '1.20'
+authors: [ oneLiLi ]
+commands:
+  bingo:
+    description: "the basic command of BingoUHC"
+    usage: "/bingo"
+permissions:
+  bingo.*:
+    description: Gives access to all BingoUHC commands
+    children:
+      bingo.force-reset: true
+      bingo.set-lobby: true
+  bingo.force-reset:
+    description: Allows you to reset game with -force
+    default: op
+  bingo.set-lobby:
+    description: Allows you to set waiting lobby
+    default: op

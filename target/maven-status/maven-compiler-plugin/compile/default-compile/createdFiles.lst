@@ -11,6 +11,7 @@ org\bingoUHC_reloaded\PlayerListener.class
 org\bingoUHC_reloaded\ConfigManager.class
 org\bingoUHC_reloaded\CommandHandler.class
 org\bingoUHC_reloaded\BingoTeam.class
+org\bingoUHC_reloaded\BingoItem.class
 org\bingoUHC_reloaded\GameState.class
 org\bingoUHC_reloaded\GameListener$1.class
 org\bingoUHC_reloaded\TranslationHelper.class

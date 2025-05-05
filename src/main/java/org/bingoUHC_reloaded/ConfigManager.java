@@ -2,6 +2,7 @@ package org.bingoUHC_reloaded;
 
 import com.google.gson.*;
 import org.bukkit.*;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.*;
 import java.io.*;
 import java.nio.file.Files;
@@ -13,16 +14,42 @@ public class ConfigManager {
     private final YamlConfiguration langConfig = new YamlConfiguration();
     private final YamlConfiguration itemConfig = new YamlConfiguration();
     private final YamlConfiguration config;
+    private final File itemsFile; // 声明 itemsFile
+    private final List<BingoItem> items = new ArrayList<>(); // 声明 items
 
     public ConfigManager(BingoUHC_reloaded plugin) {
         this.plugin = plugin;
         this.config = (YamlConfiguration) plugin.getConfig();
+        this.itemsFile = new File(plugin.getDataFolder(), "items.yml"); // 初始化 itemsFile
     }
 
     public void loadConfigs() throws Exception {
         loadMainConfig();
         loadLanguageConfig();
         loadItemConfig();
+    }
+
+    public void loadItems() {
+        FileConfiguration config = YamlConfiguration.loadConfiguration(itemsFile);
+        ConfigurationSection itemsSection = config.getConfigurationSection("items");
+
+        if(itemsSection != null) {
+            items.clear();
+            for(String key : itemsSection.getKeys(false)) {
+                ConfigurationSection itemSec = itemsSection.getConfigurationSection(key);
+                Material material = Material.matchMaterial(itemSec.getString("material"));
+                String name = itemSec.getString("name");
+                int weight = itemSec.getInt("weight", 1); // 默认权重为1
+
+                if(material != null) {
+                    items.add(new BingoItem(material, name, weight));
+                }
+            }
+        }
+    }
+
+    public List<BingoItem> getItems() {
+        return items;
     }
 
     private void loadMainConfig() throws Exception {

@@ -12,6 +12,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 import org.bingoUHC_reloaded.GameState;
+import org.bukkit.scoreboard.*;
+
 import java.util.*;
 
 public class GameManager {
@@ -26,6 +28,12 @@ public class GameManager {
     private final Set<UUID> resetVotes = new HashSet<>();
     private final Map<UUID, Integer> rtpCooldownPlayers = new HashMap<>();
     private final Map<UUID, Integer> voteDifficulties = new HashMap<>();
+    private List<List<BingoItem>> bingoBoard;
+    private final Map<Player, Integer[]> playerProgress = new HashMap<>();
+    private Scoreboard bingoScoreboard;
+    private Objective bingoObjective;
+    private GameManager gameManager;
+    private final List<Player> registeredPlayers = new ArrayList<>();
 
     public GameManager(BingoUHC_reloaded plugin) {
         this.plugin = plugin;
@@ -102,8 +110,11 @@ public class GameManager {
                 // 2. 播放结束动画和音效
                 playEndEffects(winningTeam);
 
+                Thread.sleep(5000);
+                resetGame();
+
                 // 4. 延迟后执行服务器重启
-                Thread.sleep(10000); // 10秒后重启
+                Thread.sleep(5000); // 10秒后重启
                 restartServer();
             } catch (Exception e) {
                 plugin.getLogger().severe("游戏结束流程异常: " + e.getMessage());
@@ -255,11 +266,12 @@ public class GameManager {
             updateTimer();
             timer -= 0.05;
         } else {
-            startGame();
+            // 从GameManager获取已注册玩家
+            startGame(gameManager.getRegisteredPlayers());
         }
     }
 
-    private void startGame() {
+    private void startGame(List<Player> players) {
         plugin.getServer().getWorlds().forEach(w ->
                 w.setGameRule(GameRule.KEEP_INVENTORY, true));
 
@@ -272,6 +284,17 @@ public class GameManager {
             // 给予初始工具
             p.getInventory().addItem(plugin.getItemManager().getDefaultTools());
         });
+
+        // 初始化所有玩家进度
+        for (Player player : players) {
+            playerProgress.put(player, new Integer[5]);
+            if (bingoScoreboard != null) {
+                player.setScoreboard(bingoScoreboard);
+            }
+        }
+
+        // 初始化记分板
+        initializeScoreboard();
         state = 4;
     }
 
@@ -538,5 +561,89 @@ public class GameManager {
         // 检查名称或NBT标签
         return meta.getDisplayName().equals(ChatColor.BLUE + "队伍选择器") ||
                 meta.getPersistentDataContainer().has(new NamespacedKey(plugin, "team_selector"), PersistentDataType.STRING);
+    }
+
+    public void checkItemAcquired(Player player, ItemStack item) {
+        for (int x = 0; x < 5; x++) {
+            for (int y = 0; y < 5; y++) {
+                BingoItem bingoItem = bingoBoard.get(x).get(y);
+                if (bingoItem.getMaterial() == item.getType()) {
+                    // 广播消息
+                    Bukkit.broadcastMessage(
+                            ChatColor.GOLD + player.getName() +
+                                    ChatColor.GREEN + " 获得了Bingo物品: " +
+                                    ChatColor.AQUA + bingoItem.getName());
+
+                    // 更新玩家地图
+                    updatePlayerMap(player, x, y);
+                    return; // 找到匹配后立即返回
+                }
+            }
+        }
+    }
+
+    public List<List<BingoItem>> getBingoBoard() {
+        return bingoBoard;
+    }
+
+    public void updatePlayerMap(Player player, int x, int y) {
+        // 1. 更新玩家进度
+        Integer[] progress = playerProgress.getOrDefault(player, new Integer[5]);
+        progress[y] = (progress[y] == null) ? 1 : progress[y] + 1;
+        playerProgress.put(player, progress);
+
+        // 2. 更新记分板显示
+        updateScoreboard(player);
+
+        // 3. 可选：发送标题通知
+        player.sendTitle("✓ 获得物品", "坐标(" + (x+1) + "," + (y+1) + ")", 10, 40, 10);
+    }
+
+    private void updateScoreboard(Player player) {
+        if (bingoScoreboard == null) {
+            initializeScoreboard();
+        }
+
+        // 更新玩家个人进度
+        Integer[] progress = playerProgress.get(player);
+        if (progress == null) return;
+
+        for (int i = 0; i < 5; i++) {
+            Score score = bingoObjective.getScore("第 " + (i+1) + " 行: ");
+            score.setScore(progress[i] != null ? progress[i] : 0);
+        }
+
+        player.setScoreboard(bingoScoreboard);
+    }
+
+    private void initializeScoreboard() {
+        ScoreboardManager manager = Bukkit.getScoreboardManager();
+        bingoScoreboard = manager.getNewScoreboard();
+        bingoObjective = bingoScoreboard.registerNewObjective("bingo", "dummy",
+                ChatColor.GOLD + "" + ChatColor.BOLD + "BINGO进度");
+        bingoObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+    }
+
+    // 注册玩家
+    public void registerPlayer(Player player) {
+        if (!registeredPlayers.contains(player)) {
+            registeredPlayers.add(player);
+        }
+    }
+
+    // 取消注册
+    public void unregisterPlayer(Player player) {
+        registeredPlayers.remove(player);
+    }
+
+    // 获取已注册玩家
+    public List<Player> getRegisteredPlayers() {
+        return new ArrayList<>(registeredPlayers); // 返回副本以保证线程安全
+    }
+
+    public void resetGame() {
+        registeredPlayers.clear();
+        bingoBoard.clear();
+        playerProgress.clear();
     }
 }

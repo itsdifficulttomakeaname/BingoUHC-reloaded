@@ -220,4 +220,19 @@ public class BingoBoard {
         }
         resetMapRenderer(); // 更新地图渲染
     }
+
+    private BingoItem getRandomItemWithWeight(List<BingoItem> items) {
+        int totalWeight = items.stream().mapToInt(BingoItem::getWeight).sum();
+        int random = new Random().nextInt(totalWeight);
+        int current = 0;
+
+        for (BingoItem item : items) {
+            current += item.getWeight();
+            if (random < current) {
+                return item;
+            }
+        }
+
+        return items.get(0); // 默认返回第一个
+    }
 }

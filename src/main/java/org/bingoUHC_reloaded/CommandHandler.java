@@ -1,5 +1,6 @@
 package org.bingoUHC_reloaded;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
@@ -8,6 +9,7 @@ import java.util.*;
 
 public class CommandHandler implements CommandExecutor, TabCompleter {
     private final BingoUHC_reloaded plugin;
+    private GameManager gameManager;
     private final List<String> COMMANDS = Arrays.asList(
             "help", "tp", "reset", "rtp", "kill", "players", "panel", "setlobby", "vd");
 
@@ -35,6 +37,9 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
             case "panel": return handlePanel(player);
             case "setlobby": return handleSetLobby(player);
             case "vd": return handleVoteDifficulty(player, args);
+            case "check": return handleCheckCommand(sender, args);
+            case "join": return handleRegisterCommand((Player) sender);
+            case "quit": handleUnregisterCommand((Player) sender);
             default:
                 player.sendMessage(plugin.getConfigManager().translateMessage("unknown-command"));
                 return true;
@@ -213,6 +218,48 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
             }
         }
         return false;
+    }
+
+    private boolean handleCheckCommand(CommandSender sender, String[] args) {
+        if(!(sender instanceof Player)) {
+            sender.sendMessage("只有玩家可以执行此命令");
+            return true;
+        }
+
+        if(args.length != 3) {
+            sender.sendMessage("用法: /bingo check <x> <y>");
+            return true;
+        }
+
+        try {
+            int x = Integer.parseInt(args[1]);
+            int y = Integer.parseInt(args[2]);
+
+            if(x < 1 || x > 5 || y < 1 || y > 5) {
+                sender.sendMessage("坐标必须在1-5之间");
+                return true;
+            }
+
+            BingoItem item = gameManager.getBingoBoard().get(x-1).get(y-1);
+            sender.sendMessage(String.format("坐标(%d,%d)的物品是: %s", x, y, item.getName()));
+
+        } catch (NumberFormatException e) {
+            sender.sendMessage("坐标必须是数字");
+        }
+
+        return true;
+    }
+
+    private boolean handleRegisterCommand(Player player) {
+        gameManager.registerPlayer(player);
+        player.sendMessage(ChatColor.GREEN + "你已成功报名宾果游戏!");
+        return true;
+    }
+
+    private boolean handleUnregisterCommand(Player player) {
+        gameManager.unregisterPlayer(player);
+        player.sendMessage(ChatColor.RED + "你已退出宾果游戏");
+        return true;
     }
 
     @Override

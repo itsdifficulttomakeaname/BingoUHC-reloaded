@@ -9,11 +9,13 @@ import org.bukkit.event.*;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class GameListener implements Listener {
     private final BingoUHC_reloaded plugin;
+    private GameManager gameManager;
 
     public GameListener(BingoUHC_reloaded plugin) {
         this.plugin = plugin;
@@ -45,7 +47,12 @@ public class GameListener implements Listener {
         }else{
             return;
         }
+    }
 
+    @EventHandler
+    public void onPlayerPickupItem(PlayerPickupItemEvent event) {
+        ItemStack item = event.getItem().getItemStack();
+        gameManager.checkItemAcquired(event.getPlayer(), item);
     }
 
     @EventHandler

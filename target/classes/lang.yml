@@ -1,0 +1,69 @@
+# 请不要修改这项配置 #
+config-version: 3
+# 完整消息 #
+# full message #
+starting-reminder: "&8[&e&lBingo&b&lUHC&r&8] &e游戏将在 &b&l%var0% &r&e秒后开始."
+start-preparing: "&8[&e&lBingo&b&lUHC&r&8] &e人数足够, 游戏即将开始."
+stop-preparing: "&8[&e&lBingo&b&lUHC&r&8] &e人数不足, 倒计时中断."
+observing-panel-started: "&8[&e&lBingo&b&lUHC&r&8] &e游戏即将开始, 现在你有 &b&l%var0% &r&e秒观察物品面板."
+observing-terrain-started: "&8[&e&lBingo&b&lUHC&r&8] &e游戏即将开始, 现在你有 &b&l%var0% &r&e秒观察周围地形."
+game-started: "&8[&e&lBingo&b&lUHC&r&8] &e游戏开始, 祝你好运!"
+random-teamed: "&8[&e&lBingo&b&lUHC&r&8] &e你并未选择一个队伍, 已为你随机分配到 %var0%&r&e."
+timer-reminder: "&8[&e&lBingo&b&lUHC&r&8] &e倒计时剩余 &b&l%var0% &r&e秒"
+game-timer: "&8[&e&lBingo&b&lUHC&r&8] &e游戏已开始 &b&l%var0%"
+item-collected: "&8[&e&lBingo&b&lUHC&r&8] &e队伍 %var0% &r&e收集了物品 &b&l%var1%&r&e."
+join-halfway: "&8[&e&lBingo&b&lUHC&r&8] &e游戏已开始, 你可以旁观该游戏."
+game-win: "&8[&e&lBingo&b&lUHC&r&8] &e获胜的队伍是 &b&l%var0%&r&e."
+game-draw: "&8[&e&lBingo&b&lUHC&r&8] &e游戏以平局结束."
+team-selected: "&8[&e&lBingo&b&lUHC&r&8] &e你选择了队伍 &b&l%var0%&r&e."
+help-message: |
+  &8---===≡≡≡[&e&lBingo&b&lUHC&r&8]≡≡≡===---
+  &8 - &e/bingo help        &b展示帮助页面
+  &8 - &e/bingo tp <Player>        &b传送至一个同队伍玩家
+  &8 - &e/bingo reset [-force]        &b结束当前游戏, 需要所有人同意
+  &8 - &e/bingo check <x> <y>        &b确认处于<x, y>的物品名称, x和y范围为1-5
+  &8 - &e/bingo rtp        &b随机传送至一个安全位置
+  &8 - &e/bingo kill        &b将玩家传送至重生点
+  &8 - &e/bingo players        &b查看当前玩家和玩家分队
+  &8 - &e/bingo panel        &b获取一份物品面板
+  &8 - &e/bingo setlobby        &b设置当前位置为等待大厅
+  &8 - &e/bingo vd <difficulty(0-100)>        &b在游戏开始前投票难度
+unknown-command: "&8[&e&lBingo&b&lUHC&r&8] &e未知命令, 请输入/help查看用法."
+difficulty-voted: "&8[&e&lBingo&b&lUHC&r&8] &e已记录难度投票."
+player-non-exists: "&8[&e&lBingo&b&lUHC&r&8] &e玩家 &b&l%var0% &r&e不存在."
+player-team-different: "&8[&e&lBingo&b&lUHC&r&8] &e玩家 &b&l%var0% &r&e与你队伍不同."
+cannot-self-teleport: "&8[&e&lBingo&b&lUHC&r&8] &e无法传送你自己."
+player-teleported: "&8[&e&lBingo&b&lUHC&r&8] &e已将 &b&l%var0% &r&e传送至 &b&l%var1%&r&e."
+random-teleported: "&8[&e&lBingo&b&lUHC&r&8] &e已将 &b&l%var0% &r&e随机传送."
+cannot-random-teleport: "&8[&e&lBingo&b&lUHC&r&8] &e找不到合适的传送地点."
+random-teleport-cooldown: "&8[&e&lBingo&b&lUHC&r&8] &e你需要 &b&l%var0% &r&e才能再次传送."
+no-permission: "&8[&e&lBingo&b&lUHC&r&8] &e你没有权限这样做."
+vote-end: "&8[&e&lBingo&b&lUHC&r&8] &e玩家 &b&l%var0% &r&e投票平局&r&8[&b&l%var1%&r&8]&e, 输入/bingo reset同意该投票"
+vote-end-disabled: "&8[&e&lBingo&b&lUHC&r&8] &e投票重置不可用."
+already-voted: "&8[&e&lBingo&b&lUHC&r&8] &e你已经参与本次投票."
+vote-end-timeout: "&8[&e&lBingo&b&lUHC&r&8] &e投票平局超时, 已重置."
+check-item: "&8[&e&lBingo&b&lUHC&r&8] &e该位置的物品为 &b&l%var0%&r&e."
+game-mode-info: "&8[&e&lBingo&b&lUHC&r&8] &e本次的游戏模式为 &b&l%var0%&r&e."
+unexpected-error: "&8[&e&lBingo&b&lUHC&r&8] &e遇到未知错误."
+lobby-set-success: "&8[&e&lBingo&b&lUHC&r&8] &e大厅设置成功."
+end-game-timer: "&8[&e&lBingo&b&lUHC&r&8] &e获胜用时 &b&l%var0%&r&e."
+item-disappeared: "&8[&e&lBingo&b&lUHC&r&8] &e队伍 %var0% &r&e收集的物品 &b&l%var1% &r&e消失了."
+difficulty-info: "&8[&e&lBingo&b&lUHC&r&8] &e本次游戏的难度为 &b&l%var0%&r&e%."
+check-players: |
+  &8[&e&lBingo&b&lUHC&r&8] &e玩家分队信息如下:
+  &4红队: %var0%
+  &e黄队: %var1%
+  &a绿队: %var2%
+  &3蓝队: %var3%
+# 部分消息 #
+# message part #
+team-selector: "&f队伍选择器"
+red-team: "&4红队"
+yellow-team: "&e黄队"
+green-team: "&a绿队"
+blue-team: "&3蓝队"
+no-team: "&f无队伍"
+normal-mode: "常规"
+monopolization-mode: "独占"
+disappearance-mode: "消失"
+mode-suffix: "模式"

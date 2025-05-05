@@ -4,6 +4,8 @@ import com.google.gson.*;
 import org.bukkit.*;
 import org.bukkit.configuration.file.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 public class ConfigManager {
@@ -24,8 +26,22 @@ public class ConfigManager {
     }
 
     private void loadMainConfig() throws Exception {
-        // 从resources复制默认配置文件（如果不存在）
-        plugin.saveResource("config.yml", false);
+        File configFile = new File(plugin.getDataFolder(), "config.yml");
+
+        // 如果配置文件不存在，或者是一个空文件，就从资源中复制
+        if (!configFile.exists() || configFile.length() == 0) {
+            // 确保插件数据目录存在
+            plugin.getDataFolder().mkdirs();
+
+            // 从 JAR 资源中复制 config.yml
+            try (InputStream in = plugin.getResource("config.yml")) {
+                if (in == null) {
+                    throw new FileNotFoundException("默认 config.yml 未在插件 JAR 中找到！");
+                }
+                Files.copy(in, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                plugin.getLogger().info("已从资源文件复制默认 config.yml");
+            }
+        }
 
         // 加载配置
         YamlConfiguration defConfig = new YamlConfiguration();

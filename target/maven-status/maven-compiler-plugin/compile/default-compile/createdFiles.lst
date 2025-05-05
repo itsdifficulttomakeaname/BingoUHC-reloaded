@@ -1,0 +1,14 @@
+org\bingoUHC_reloaded\BingoUtils.class
+org\bingoUHC_reloaded\BingoUHC_reloaded.class
+org\bingoUHC_reloaded\BingoBoard.class
+org\bingoUHC_reloaded\GameListener.class
+org\bingoUHC_reloaded\BingoAPI.class
+org\bingoUHC_reloaded\TeamManager.class
+org\bingoUHC_reloaded\BingoBoard$1.class
+org\bingoUHC_reloaded\GameManager.class
+org\bingoUHC_reloaded\PlayerListener.class
+org\bingoUHC_reloaded\ConfigManager.class
+org\bingoUHC_reloaded\CommandHandler.class
+org\bingoUHC_reloaded\GameListener$1.class
+org\bingoUHC_reloaded\TranslationHelper.class
+org\bingoUHC_reloaded\ItemManager.class

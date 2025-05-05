@@ -1,0 +1,89 @@
+# 请不要修改这项配置 #
+config-version: 2
+# 这两项配置决定至少需要多少人开始游戏和游戏容纳最大人数 #
+min-players: 2
+max-players: 16
+# 这项配置决定游戏模式 #
+# 保留空列表为普通模式 #
+# 包含"MONOPOLIZATION"为独占模式，每个物品只能由一个玩家或队伍收集 #
+# 包含"DISAPPEARANCE"为消失模式，每个队伍收集第六个物品的时候收集的第一个物品会消失，且玩家背包的对应物品也会消失 #
+# 包含""为 #
+game-mode: []
+# 这三项配置决定到达最少人数后玩家需要等待的时间、玩家观察面板的时间和玩家观察地形的时间 #
+preparing-time: 50
+observing-panel-time: 30
+observing-terrain-time: 30
+# 这项配置决定大厅所在的世界，位置由该世界的出生点决定 #
+waiting-world: "world_the_end"
+# 这项配置决定玩家应该在游戏开始的时候获得什么工具，若需禁用请填 "[]" #
+default-tools:
+  silk-touch-pickaxe:
+    material: "IRON_PICKAXE"
+    name: "&b&l精准之镐"
+    durability: 5
+    enchantments:
+      - "SILK_TOUCH I"
+    lore:
+      - ""
+      - "&8使用此镐可以直接收集需要精准采集的物品"
+      - "&8但是只能使用5次"
+  default-pickaxe:
+    material: "WOODEN_PICKAXE"
+    name: "&b&l急速之镐"
+    durability: 0
+    enchantments:
+      - "EFFICIENCY IV"
+      - "UNBREAKING CCLV"
+    lore:
+      - ""
+      - "&8此镐可以无限制使用"
+      - "&8但只有木镐的挖掘等级"
+  default-axe:
+    material: "WOODEN_AXE"
+    name: "&b&l急速之斧"
+    durability: 0
+    enchantments:
+      - "EFFICIENCY IV"
+      - "UNBREAKING CCLV"
+    lore:
+      - ""
+      - "&8此斧可以无限制使用"
+  default-shovel:
+    material: "WOODEN_SHOVEL"
+    name: "&b&l急速之铲"
+    durability: 0
+    enchantments:
+      - "EFFICIENCY IV"
+      - "UNBREAKING CCLV"
+    lore:
+      - ""
+      - "&8此铲可以无限制使用"
+# 这项配置决定倒计时在哪些数字时玩家应该被提醒 #
+timer-reminder: [ 30, 15, 10, 5, 4, 3, 2, 1 ]
+# 这项配置决定玩家应该在距离地面多高的位置观察地形
+observing-terrain-y-offset: 30
+# 这项配置决定玩家队伍的出生点范围 #
+spawn-range: 16384
+# 这项配置表示是否允许队友互相伤害 #
+allow-teammate-damage: false
+# 这两项配置表示投票游戏结束进行的时间和冷却时间 #
+vote-end-time: 30
+vote-end-cooldown: 60
+# 这项配置决定随机传送时候的半径、尝试落地点的次数和冷却时间 #
+random-teleport-range: 8192
+random-teleport-try-limit: 10
+random-teleport-cooldown: 200
+random-teleport-blacklist-biomes:
+  - OCEAN
+  - DEEP_OCEAN
+# 这项配置表示安装新版本插件时是否自动同步最新的items.yml #
+auto-rewrite-items: false
+# 这项配置表示玩家使用/bingo rtp命令的冷却 #
+# 这项配置表示服务器重置方式，lobby-name若无法知晓则无需更改 #
+# 1.若使用Windows服务器，请将restart-command设为restart，然后在spigot.yml中将启动命令设置为start.bat，并确保服务端同目录包含start.bat启动脚本 #
+# 2.若使用Linux服务器，请将restart-command设为restart，然后在spigot.yml中将启动命令设置为./start.sh，并确保服务端同目录包含start.sh启动脚本 #
+# 3.若使用MCServerManager面板，请将restart-command设为stop，然后打开面板选项中的自动重启 #
+# 4.若以上方法均不可行，请设置restart-command为reload(spigot)或reload confirm(paper) #
+bungee-mode:
+  lobby-name: lobby
+  restart-command: restart

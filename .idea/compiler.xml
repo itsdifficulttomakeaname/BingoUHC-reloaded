@@ -12,7 +12,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="BingoUHC_reloaded" options="" />
+      <module name="BingoUHC_reloaded" options="--add-modules java.desktop" />
     </option>
   </component>
 </project>

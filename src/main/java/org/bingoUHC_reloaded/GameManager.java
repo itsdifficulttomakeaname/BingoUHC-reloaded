@@ -5,13 +5,18 @@ import com.google.common.io.ByteStreams;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
+import org.bingoUHC_reloaded.GameState;
 import java.util.*;
 
 public class GameManager {
     private final BingoUHC_reloaded plugin;
+    private GameState gameState;
     private int state = 0;
     private int mode = 0;
     private double timer = -1;
@@ -508,7 +513,30 @@ public class GameManager {
 
     // Getter/Setter方法...
     public int getGameState() { return state; }
-    public void setGameState(int state) { this.state = state; }
+    public void setGameState(GameState state) {
+        this.gameState = state;
+
+        if (state == GameState.PREPARING) {
+            // 清除所有玩家的队伍选择器
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                PlayerInventory inventory = player.getInventory();
+                // 遍历背包所有物品
+                for (ItemStack item : inventory.getContents()) {
+                    if (isTeamSelectorItem(item)) {
+                        inventory.remove(item); // 移除物品
+                    }
+                }
+            });
+        }
+    }
     public int getMode() { return mode; }
     public void setMode(int mode) { this.mode = mode; }
+
+    private boolean isTeamSelectorItem(ItemStack item) {
+        if (item == null || !item.hasItemMeta()) return false;
+        ItemMeta meta = item.getItemMeta();
+        // 检查名称或NBT标签
+        return meta.getDisplayName().equals(ChatColor.BLUE + "队伍选择器") ||
+                meta.getPersistentDataContainer().has(new NamespacedKey(plugin, "team_selector"), PersistentDataType.STRING);
+    }
 }

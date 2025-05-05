@@ -1,5 +1,8 @@
 package org.bingoUHC_reloaded;
 
+import org.bingoUHC_reloaded.event.BingoItemCollectEvent;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -31,13 +34,18 @@ public class GameListener implements Listener {
 
     @EventHandler
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
-        // 使用 allowTeamDamage() 方法
-        if (plugin.getGameManager().getGameState() == 4) {
-            boolean sameTeam = plugin.getTeamManager().isTeammate(
-                    (Player)event.getEntity(),
-                    (Player)event.getDamager());
-            event.setCancelled(sameTeam && !plugin.getConfigManager().allowTeamDamage());
+        if (event.getDamager() instanceof Player) {
+            // 使用 allowTeamDamage() 方法
+            if (plugin.getGameManager().getGameState() == 4) {
+                boolean sameTeam = plugin.getTeamManager().isTeammate(
+                        (Player)event.getEntity(),
+                        (Player)event.getDamager());
+                event.setCancelled(sameTeam && !plugin.getConfigManager().allowTeamDamage());
+            }
+        }else{
+            return;
         }
+
     }
 
     @EventHandler
@@ -95,6 +103,19 @@ public class GameListener implements Listener {
         ItemStack item = new ItemStack(material);
         item.setItemMeta(plugin.getItemManager().createTeamItemMeta(material, team));
         return item;
+    }
+
+    @EventHandler
+    public void onItemCollect(BingoItemCollectEvent event) {
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem();
+
+        // 公告收集信息
+        String message = ChatColor.GOLD + "[Bingo] " +
+                ChatColor.GREEN + player.getName() +
+                ChatColor.WHITE + " 收集了 " +
+                ChatColor.AQUA + item.getType().toString();
+        Bukkit.broadcastMessage(message);
     }
 
     @EventHandler

@@ -5,10 +5,14 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.MapMeta;
 import org.bukkit.map.*;
+
+
 import java.awt.*;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class BingoBoard {
     private final BingoUHC_reloaded plugin;
@@ -16,9 +20,23 @@ public class BingoBoard {
     private final BufferedImage[][] panelTextures = new BufferedImage[5][5];
     private final int[][] slotStates = new int[5][5];
     private MapView panel;
+    private static final byte[] TEAM_COLORS = {
+            MapPalette.matchColor(Color.RED),    // 1 << 0 (红)
+            MapPalette.matchColor(Color.YELLOW), // 1 << 1 (黄)
+            MapPalette.matchColor(Color.GREEN),  // 1 << 2 (绿)
+            MapPalette.matchColor(Color.BLUE)    // 1 << 3 (蓝)
+    };
+    private static final int ITEM_SPACING = 25; // 物品间距（像素）
+    private static final int ITEM_OFFSET = 12;  // 起始偏移量（居中）
 
     public BingoBoard(BingoUHC_reloaded plugin) {
         this.plugin = plugin;
+    }
+
+    private List<BingoTeam> getCollectedTeams(int gridX, int gridY) {
+        return plugin.getTeamManager().getTeams().stream()
+                .filter(team -> team.hasCollectedItem(gridX, gridY))
+                .collect(Collectors.toList());
     }
 
     public void initializeBoard() {
@@ -75,29 +93,48 @@ public class BingoBoard {
                 return image;
             }
 
+            private void fillQuadrant(Graphics2D g, int centerX, int centerY, int radius, int quadrant) {
+                for (int dx = 0; dx < radius; dx++) {
+                    for (int dy = 0; dy < radius; dy++) {
+                        int targetX, targetY;
+                        switch (quadrant) {
+                            case 0: // 左上
+                                targetX = centerX - dx;
+                                targetY = centerY - dy;
+                                break;
+                            case 1: // 右上
+                                targetX = centerX + dx;
+                                targetY = centerY - dy;
+                                break;
+                            case 2: // 左下
+                                targetX = centerX - dx;
+                                targetY = centerY + dy;
+                                break;
+                            case 3: // 右下
+                                targetX = centerX + dx;
+                                targetY = centerY + dy;
+                                break;
+                            default:
+                                continue;
+                        }
+                        g.fillRect(targetX, targetY, 1, 1);
+                    }
+                }
+            }
+
             private void drawSlotState(Graphics2D g, int x, int y) {
                 int state = slotStates[x][y];
                 if (state == 0) return;
 
-                int px = x * 24 + 6;
-                int py = y * 24 + 6;
-                int size = 20;
+                int centerX = x * 24 + 12; // 格子中心X
+                int centerY = y * 24 + 12; // 格子中心Y
+                int radius = 10; // 象限半径
 
-                if ((state & 1) != 0) { // 红队
-                    g.setColor(Color.RED);
-                    g.fillRect(px, py, size, size);
-                }
-                if ((state & 2) != 0) { // 黄队
-                    g.setColor(Color.YELLOW);
-                    g.fillRect(px + 10, py, size, size);
-                }
-                if ((state & 4) != 0) { // 绿队
-                    g.setColor(Color.GREEN);
-                    g.fillRect(px, py + 10, size, size);
-                }
-                if ((state & 8) != 0) { // 蓝队
-                    g.setColor(Color.BLUE);
-                    g.fillRect(px + 10, py + 10, size, size);
+                for (int i = 0; i < 4; i++) {
+                    if ((state & (1 << i)) != 0) {
+                        g.setColor(new Color(TEAM_COLORS[i]));
+                        fillQuadrant(g, centerX, centerY, radius, i);
+                    }
                 }
             }
 
@@ -111,13 +148,16 @@ public class BingoBoard {
     }
 
     public boolean checkItemCollection(Player player, Material material) {
+        int teamIndex = plugin.getTeamManager().getPlayerTeamIndex(player.getUniqueId());
+        if (teamIndex == -1) return false;
+
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 if (panelItems[j][i] == material) {
-                    int team = plugin.getTeamManager().getPlayerTeam(player.getUniqueId());
-                    if ((slotStates[j][i] & team) == 0) {
-                        slotStates[j][i] |= team;
-                        plugin.getTeamManager().recordCollectedItem(team, material);
+                    BingoTeam team = plugin.getTeamManager().getTeams().get(teamIndex);
+                    if (!team.hasCollectedItem(j, i)) {
+                        team.addCollectedItem(j, i);
+                        slotStates[j][i] |= (1 << teamIndex); // 更新位掩码
                         resetMapRenderer();
                         return true;
                     }

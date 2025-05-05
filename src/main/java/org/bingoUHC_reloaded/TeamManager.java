@@ -2,6 +2,12 @@ package org.bingoUHC_reloaded;
 
 import org.bukkit.*;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
+
 import java.util.*;
 
 public class TeamManager {
@@ -9,6 +15,7 @@ public class TeamManager {
     private final Map<UUID, Integer> playerTeams = new HashMap<>();
     private final Map<Integer, Location> teamLocations = new HashMap<>();
     private final Map<Integer, List<Material>> teamDisappearanceRecorder = new HashMap<>();
+    private final List<BingoTeam> teams = new ArrayList<>();
 
     public TeamManager(BingoUHC_reloaded plugin) {
         this.plugin = plugin;
@@ -20,6 +27,23 @@ public class TeamManager {
         teamDisappearanceRecorder.put(2, new ArrayList<>());
         teamDisappearanceRecorder.put(4, new ArrayList<>());
         teamDisappearanceRecorder.put(8, new ArrayList<>());
+    }
+
+    // 初始化队伍（红、黄、绿、蓝）
+    public void initializeTeams() {
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+        String[] colors = {"红", "黄", "绿", "蓝"};
+        for (String color : colors) {
+            Team bukkitTeam = scoreboard.getTeam("bingo_" + color) != null ?
+                    scoreboard.getTeam("bingo_" + color) :
+                    scoreboard.registerNewTeam("bingo_" + color);
+            teams.add(new BingoTeam(bukkitTeam));
+        }
+    }
+
+    // 获取所有自定义队伍
+    public List<BingoTeam> getTeams() {
+        return teams;
     }
 
     public void assignRandomTeam(Player player) {
@@ -118,7 +142,7 @@ public class TeamManager {
 
     private void removeCollectedItem(int team, Material material) {
         // 从所有该队伍玩家的背包中移除物品
-        /*
+
             playerTeams.forEach((uuid, t) -> {
                 if (t == team) {
                     Player player = plugin.getServer().getPlayer(uuid);
@@ -127,7 +151,7 @@ public class TeamManager {
                     }
                 }
             });
-        */
+
         // 从面板状态中移除
         plugin.getBingoBoard().removeItemFromSlots(team, material);
 
@@ -138,5 +162,34 @@ public class TeamManager {
                 TranslationHelper.getItemName(material, null) // 使用服务器默认语言
         );
         plugin.getServer().broadcastMessage(message);
+    }
+
+    public ItemStack getTeamSelectorItem() {
+        ItemStack compass = new ItemStack(Material.COMPASS);
+        ItemMeta meta = compass.getItemMeta();
+        meta.setDisplayName(ChatColor.BLUE + "队伍选择器");
+        return compass;
+    }
+
+    // 检查队伍是否收集了某位置的物品
+    public boolean hasCollectedItem(BingoTeam team, int gridX, int gridY) {
+        return team.getCollectedItems().contains(gridX + "," + gridY);
+    }
+
+    // 获取玩家队伍的索引（0=红，1=黄，2=绿，3=蓝）
+    public int getPlayerTeamIndex(UUID playerId) {
+        for (int i = 0; i < teams.size(); i++) {
+            if (teams.get(i).hasPlayer(playerId)) {
+                return i;
+            }
+        }
+        return -1; // 未找到队伍
+    }
+
+    // TeamManager.java
+    public void recordCollectedItem(int teamIndex, int gridX, int gridY) {
+        if (teamIndex >= 0 && teamIndex < teams.size()) {
+            teams.get(teamIndex).addCollectedItem(gridX, gridY);
+        }
     }
 }

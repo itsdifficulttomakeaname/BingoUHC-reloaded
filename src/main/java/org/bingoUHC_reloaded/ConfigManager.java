@@ -27,21 +27,29 @@ public class ConfigManager {
 
     private void loadMainConfig() throws Exception {
         File configFile = new File(plugin.getDataFolder(), "config.yml");
+        plugin.getLogger().info("配置文件路径: " + configFile.getAbsolutePath());
 
-        // 如果配置文件不存在，或者是一个空文件，就从资源中复制
-        if (!configFile.exists() || configFile.length() == 0) {
-            // 确保插件数据目录存在
-            plugin.getDataFolder().mkdirs();
+        // 优先检查磁盘文件是否存在
+        if (!configFile.exists()) {
+            plugin.getLogger().info("未找到配置文件，正在从JAR资源复制...");
+            plugin.getDataFolder().mkdirs(); // 确保目录存在
 
-            // 从 JAR 资源中复制 config.yml
+            // 从JAR资源复制到磁盘
             try (InputStream in = plugin.getResource("config.yml")) {
                 if (in == null) {
-                    throw new FileNotFoundException("默认 config.yml 未在插件 JAR 中找到！");
+                    throw new FileNotFoundException("JAR中未找到 config.yml");
                 }
-                Files.copy(in, configFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                plugin.getLogger().info("已从资源文件复制默认 config.yml");
+                Files.copy(in, configFile.toPath());
+                plugin.getLogger().info("配置文件复制完成");
+            } catch (IOException e) {
+                plugin.getLogger().severe("复制配置文件失败: " + e.getMessage());
+                throw e;
             }
         }
+
+        // 加载磁盘配置文件
+        config.load(configFile);
+        plugin.getLogger().info("配置文件加载成功");
 
         // 加载配置
         YamlConfiguration defConfig = new YamlConfiguration();
